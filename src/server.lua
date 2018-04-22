@@ -7,7 +7,7 @@ upnp:listen(1900, "239.255.255.250")
 upnp:on("receive", function(c, d)
   if string.match(d, "M-SEARCH") then
     local urn = d:match("ST: (urn:[%w%p]*)")
-    if (urn == device.urn) then
+    if (urn == device.urn or string.match(d, "ST: ssdp:all")) then
       local resp =
       "HTTP/1.1 200 OK\r\n" ..
         "Cache-Control: max-age=120\r\n" ..
@@ -26,8 +26,24 @@ end)
 print("Heap: ", node.heap(), "HTTP: ", "Starting server at http://" .. wifi.sta.getip() .. ":" .. device.http_port)
 local http = net.createServer(net.TCP, 10)
 http:listen(device.http_port, function(conn)
-  conn:on("receive", function( sck, data )
-    local request =  require("httpd_req").new(data)
+  conn:on("receive", function( sck, payload )
+
+    -- Some clients send POST data in multiple chunks.
+    -- Collect data packets until the size of HTTP body meets the Content-Length stated in header
+    -- this snippet borrowed from https://github.com/marcoskirsch/nodemcu-httpserver/blob/master/httpserver.lua
+    if payload:find("Content%-Length:") or bBodyMissing then
+      if fullPayload then fullPayload = fullPayload .. payload else fullPayload = payload end
+      if (tonumber(string.match(fullPayload, "%d+", fullPayload:find("Content%-Length:")+16)) > #fullPayload:sub(fullPayload:find("\r\n\r\n", 1, true)+4, #fullPayload)) then
+        bBodyMissing = true
+        return
+      else
+        payload = fullPayload
+        fullPayload, bBodyMissing = nil
+      end
+    end
+    collectgarbage()
+
+    local request =  require("httpd_req").new(payload)
     local response = require("httpd_res").new(sck)
     
     if request.path == "/" then

@@ -1,5 +1,5 @@
 /**
- *  Konnected Motion Sensor
+ *  Konnected CO Sensor
  *
  *  Copyright 2018 Konnected Inc (https://konnected.io)
  *
@@ -14,23 +14,24 @@
  *
  */
 metadata {
-  definition (name: "Konnected Motion Sensor", namespace: "konnected-io", author: "konnected.io") {
-    capability "Motion Sensor"
+  definition (name: "Konnected CO Sensor", namespace: "konnected-io", author: "konnected.io") {
+    capability "Smoke Detector"
+    capability "Carbon Monoxide Detector"
     capability "Sensor"
   }
 
   preferences {
     input name: "normalState", type: "enum", title: "Normal State",
-      options: ["Normally Closed", "Normally Open"],
+	    options: ["Normally Closed", "Normally Open"],
       defaultValue: "Normally Closed",
-      description: "Most motion sensors are Normally Closed (NC), meaning that the circuit opens when motion is detected. To reverse this logic, select Normally Open (NO)."
+      description: "By default, the alarm state is triggered when the sensor circuit is open (NC). Select Normally Open (NO) when a closed circuit indicates an alarm."
   }
 
   tiles {
     multiAttributeTile(name:"main", type: "generic", width: 6, height: 4, canChangeIcon: true) {
-      tileAttribute ("device.motion", key: "PRIMARY_CONTROL") {
-        attributeState ("inactive", label: "No Motion", icon:"st.motion.motion.inactive", backgroundColor:"#ffffff")
-        attributeState ("active",   label: "Motion",    icon:"st.motion.motion.active",   backgroundColor:"#00a0dc")
+      tileAttribute ("device.carbonMonoxide", key: "PRIMARY_CONTROL") {
+        attributeState ("clear",    label: "Clear", icon:"st.alarm.carbon-monoxide.clear", backgroundColor:"#ffffff")
+        attributeState ("detected", label: "Warning", icon:"st.alarm.carbon-monoxide.carbon-monoxide", backgroundColor:"#e86d13")
       }
     }
     main "main"
@@ -39,16 +40,16 @@ metadata {
 }
 
 def isClosed() {
-  normalState == "Normally Open" ? "active" : "inactive"
+  normalState == "Normally Open" ? "detected" : "clear"
 }
 
 def isOpen() {
-  normalState == "Normally Open" ? "inactive" : "active"
+  normalState == "Normally Open" ? "clear" : "detected"
 }
 
 // Update state sent from parent app
 def setStatus(state) {
   def stateValue = state == "1" ? isOpen() : isClosed()
-  sendEvent(name: "motion", value: stateValue)
+  sendEvent(name: "carbonMonoxide", value: stateValue)
   log.debug "$device.label is $stateValue"
 }

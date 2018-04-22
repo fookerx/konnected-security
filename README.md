@@ -23,7 +23,7 @@ the developers who have worked hard on this project.
 ## Installation Overview
 
  1. Install device drivers for your NodeMCU device.
- 1. Flash the device with the included firmware [firmware/konnected-security-2-0-5.bin](firmware/konnected-security-2-0-5.bin)
+ 1. Flash the device with the included firmware [firmware/konnected-firmware-2-0-5.bin](firmware/konnected-firmware-2-0-5.bin)
  1. Upload all the code in `src` to the device and reboot the device.
  1. Connect to the WiFi network `konnected-security_XXXXXX` to set up WiFi
  1. Follow wiring instructions and SmartThings application setup instructions in the [Konnected Security Documentation](http://docs.konnected.io/security-alarm-system)
@@ -44,17 +44,15 @@ on which board you have, there are different drivers:
 
 ### Mac & Linux Users
 
- 1. You must have Python 2 installed with `pip`. 
+ 1. You must have Python installed with `pip` or `pip3`. 
     * **Mac users**: I recommend using [Homebrew](https://brew.sh/) and `brew install python`  
  
- 1. Open up a terminal and install `esptool` and `nodemcu-uploader` packages:
+ 1. Open up a terminal and install `esptool` packages:
      
-        pip install esptool
-        pip install nodemcu-uploader
+        pip3 install esptool
         
- 1. Run the script in `scripts/flash` to flash and upload the files. You may need to edit the variables
- at the top of the script as your serial port may be different depending on your operating system and the type of NodeMCU development
- board you have.
+ 1. Run the script in `scripts/flash` to flash the firmware and software to the device. You may need to edit the variables
+ at the top of the script as your serial port may be different depending on your operating system and the type of NodeMCU development board you have. You may also need to make the script executable by running `chmod 755 scripts/flash`. 
  
  
 ### Windows Users
@@ -81,10 +79,11 @@ achieve that goal.
 
 Thank you for your support,
 
-**@heythisisnate** and **@copy-ninja**
+Nate Clark
+**@heythisisnate**
 
 #### [Donate Here with Paypal or Bitcoin](http://docs.konnected.io/donate)
 
-### [For more information click here for the complete Konnected Security Documentation](http://docs.konnected.io/security-alarm-system)
+### [For more information, click here for Konnected Documentation, Help and Community support](http://help.konnected.io)
 
 

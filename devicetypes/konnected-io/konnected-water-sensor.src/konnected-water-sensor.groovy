@@ -1,5 +1,5 @@
 /**
- *  Konnected Motion Sensor
+ *  Konnected Water Leak Sensor
  *
  *  Copyright 2018 Konnected Inc (https://konnected.io)
  *
@@ -14,23 +14,21 @@
  *
  */
 metadata {
-  definition (name: "Konnected Motion Sensor", namespace: "konnected-io", author: "konnected.io") {
-    capability "Motion Sensor"
+  definition (name: "Konnected Water Sensor", namespace: "konnected-io", author: "konnected.io") {
+    capability "Water Sensor"
     capability "Sensor"
   }
-
   preferences {
     input name: "normalState", type: "enum", title: "Normal State",
       options: ["Normally Closed", "Normally Open"],
-      defaultValue: "Normally Closed",
-      description: "Most motion sensors are Normally Closed (NC), meaning that the circuit opens when motion is detected. To reverse this logic, select Normally Open (NO)."
+      defaultValue: "Normally Open",
+      description: "Most leak sensors indicate water when the circuit is closed (NO). Select Normally Closed (NC) to reverse this logic."
   }
-
   tiles {
     multiAttributeTile(name:"main", type: "generic", width: 6, height: 4, canChangeIcon: true) {
-      tileAttribute ("device.motion", key: "PRIMARY_CONTROL") {
-        attributeState ("inactive", label: "No Motion", icon:"st.motion.motion.inactive", backgroundColor:"#ffffff")
-        attributeState ("active",   label: "Motion",    icon:"st.motion.motion.active",   backgroundColor:"#00a0dc")
+      tileAttribute ("device.water", key: "PRIMARY_CONTROL") {
+      	attributeState ("dry", label: "Dry", icon: "st.alarm.water.dry", backgroundColor: "#ffffff")
+		    attributeState ("wet", label: "Wet", icon: "st.alarm.water.wet", backgroundColor: "#00A0DC")
       }
     }
     main "main"
@@ -39,16 +37,16 @@ metadata {
 }
 
 def isClosed() {
-  normalState == "Normally Open" ? "active" : "inactive"
+  normalState == "Normally Closed" ? "dry" : "wet"
 }
 
 def isOpen() {
-  normalState == "Normally Open" ? "inactive" : "active"
+  normalState == "Normally Closed" ? "wet" : "dry"
 }
 
-// Update state sent from parent app
+//Update state sent from parent app
 def setStatus(state) {
   def stateValue = state == "1" ? isOpen() : isClosed()
-  sendEvent(name: "motion", value: stateValue)
+  sendEvent(name: "water", value: stateValue)
   log.debug "$device.label is $stateValue"
 }
